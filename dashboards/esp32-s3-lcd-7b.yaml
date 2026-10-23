@@ -41,15 +41,15 @@ esphome:
 logger:
 
 wifi:
-  use_address: !secrets ws_s3_lcd_7b_wifi_address
+  use_address: !secret ws_s3_lcd_7b_wifi_address
 
 api:
   encryption:
-    key: !secrets ws_s3_lcd_7b_api_encryption_key
+    key: !secret ws_s3_lcd_7b_api_encryption_key
 
 ota:
   - platform: esphome
-    password: !secrets ws_s3_lcd_7b_ota_password
+    password: !secret ws_s3_lcd_7b_ota_password
 
 # Time update script - This is run once per second. Use it to update any time related labels.
 script:
@@ -97,25 +97,12 @@ packages:
       rotation: "0"  # set screen rotation 0, 90, 180, 270
   wifi: !include esphome-lvgl/common/wifi.yaml
   ota_screen: !include esphome-lvgl/common/ota.yaml
-  sensors: !include esphome-lvgl/common/sensors_base.yaml
+  sensors: !include esphome-lvgl/common/sensor_base.yaml
   backlight: !include esphome-lvgl/common/backlight_time.yaml
 
 # Predefinded screen
   loading_screen: !include esphome-lvgl/components/loading_page.yaml
   info_screen: !include esphome-lvgl/components/info_page.yaml
-
-  flip_clock: !include
-    file: esphome-lvgl/ui/clock/flip_clock.yaml
-    vars:
-      uid: flip_clock
-      page_id: main_page
-      row: 1
-      column: 0
-      row_span: 2
-      column_span: 2
-      font_size: 120
-      height: "90%"
-      click_page: main_page
 
 lvgl:
   buffer_size: 100%
