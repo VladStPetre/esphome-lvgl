@@ -1,0 +1,131 @@
+---
+# Substitution variables used through the codebase
+substitutions:
+  icon_font: mdi_icons_40
+  text_font: nunito_20
+  text_color: white
+  bg_color: black
+  button_on_color: "ep_orange"
+  button_off_color: "very_dark_gray"
+  icon_on_color: "yellow"
+  icon_off_color: "gray"
+  label_on_color: "white"
+  label_off_color: "gray"
+  button_text_color: "white"
+
+  # LCD back light modes - Code in backlight_time.yaml
+  display_daytime_brightness: "100%"
+  display_nighttime_brightness: "50%"
+  display_night_hour: "0"      # Hour for night mode (0-23)
+  display_night_minute: "0"    # Minute for night mode (0-59)
+  display_backlight_timeout_always_enabled: "false"  # Set true to dim/off in all modes, not just Night
+  display_backlight_timeout_initial: "5"  # Initial backlight timeout in minutes (-1 to disable)
+
+  # defaults for popup pages
+  popup_timeout_seconds: '120'  # timeout in seconds  
+
+esphome:
+  name: esp32-s3-lcd-7b
+  friendly_name: "Waveshare ESP32-S3-Touch-LCD-7B"
+  comment: "Waveshare ESP32-S3-Touch-LCD-7B Smart Screen"
+  on_boot:
+    - priority: 400
+      then:
+        - script.execute: update_loading_page
+
+    - priority: -100
+      then:
+        - delay: 5s
+        - script.execute: clock_update
+
+logger:
+
+wifi:
+  use_address: !secrets ws_s3_lcd_7b_wifi_address
+
+api:
+  encryption:
+    key: !secrets ws_s3_lcd_7b_api_encryption_key
+
+ota:
+  - platform: esphome
+    password: !secrets ws_s3_lcd_7b_ota_password
+
+# Time update script - This is run once per second. Use it to update any time related labels.
+script:
+  # --------------------------------------------------------------------------
+  # This script is called once per minute.
+  # Any packages in this library will !extend time_update to update their own labels.
+  # You can add code here to update your own custom labels.
+  # --------------------------------------------------------------------------
+  - id: time_update
+    then:
+      - lambda: |-
+          // No operation
+
+  - id: clock_update
+    then:
+      - lvgl.label.update:
+          id: clock_label
+          text: !lambda |-
+            if (!id(system_time).now().is_valid()) {
+              return std::string("--:--");
+            }
+
+            auto now = id(system_time).now();
+            char buf[16];
+            snprintf(
+              buf,
+              sizeof(buf),
+              "%02d:%02d:%02d",
+              now.hour,
+              now.minute,
+              now.second
+            );
+            return std::string(buf);
+
+
+interval:
+  - interval: 1s
+    then:
+      - script.execute: clock_update
+
+packages:
+  hardware: !include
+    file: esphome-lvgl/hardware/waveshare-esp32-s3-touch-lcd-7B.yaml
+    vars:
+      rotation: "0"  # set screen rotation 0, 90, 180, 270
+  wifi: !include esphome-lvgl/common/wifi.yaml
+  ota_screen: !include esphome-lvgl/common/ota.yaml
+  sensors: !include esphome-lvgl/common/sensors_base.yaml
+  backlight: !include esphome-lvgl/common/backlight_time.yaml
+
+# Predefinded screen
+  loading_screen: !include esphome-lvgl/components/loading_page.yaml
+  info_screen: !include esphome-lvgl/components/info_page.yaml
+
+  flip_clock: !include
+    file: esphome-lvgl/ui/clock/flip_clock.yaml
+    vars:
+      uid: flip_clock
+      page_id: main_page
+      row: 1
+      column: 0
+      row_span: 2
+      column_span: 2
+      font_size: 120
+      height: "90%"
+      click_page: main_page
+
+lvgl:
+  buffer_size: 100%
+  pages:
+    - id: main_page
+      layout: 1x1
+      styles: page_style
+      widgets:
+        - label:
+            id: clock_label
+            align: CENTER
+            text: "--:--"
+            text_font: nunito_120
