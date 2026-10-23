@@ -41,7 +41,7 @@ api:
 
 ota:
   - platform: esphome
-    password: !secret ws_s3_lcd_7b_ota_password
+    encryption:
 
 # Time update script - This is run once per second. Use it to update any time related labels.
 script:
@@ -69,16 +69,15 @@ script:
             snprintf(
               buf,
               sizeof(buf),
-              "%02d:%02d:%02d",
+              "%02d:%02d",
               now.hour,
-              now.minute,
-              now.second
+              now.minute
             );
             return std::string(buf);
 
 
 interval:
-  - interval: 1s
+  - interval: 60s
     then:
       - script.execute: clock_update
 
@@ -91,6 +90,8 @@ packages:
   ota_screen: !include esphome-lvgl/common/ota.yaml
   sensors: !include esphome-lvgl/common/sensor_base.yaml
   backlight: !include esphome-lvgl/common/backlight_time.yaml
+  colors: !include esphome-lvgl/common/color.yaml
+  glyphs: !include esphome-lvgl/common/mdi_glyph_substitutions.yaml
 
 # Predefinded screen
   loading_screen: !include esphome-lvgl/components/loading_page.yaml
@@ -101,12 +102,16 @@ lvgl:
   pages:
     - id: main_page
       layout: 1x1
+      <<: !include esphome-lvgl/components/swipe_navigation.yaml
+      bg_color: slate_blue_gray
       widgets:
         - label:
             id: clock_label
             align: CENTER
             text: "--:--"
             text_font: nunito_120
+            text_color: white
+
 
 font:
   - file: "gfonts://Nunito"
@@ -116,3 +121,7 @@ font:
   - file: "gfonts://Nunito"
     id: nunito_20
     size: 20
+
+  - file: "gfonts://Nunito"
+    id: nunito_18
+    size: 18
