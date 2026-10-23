@@ -9,7 +9,7 @@ lvgl:
     - id: info_screen
       styles: boot_screen_style
       <<: !include
-        file: ../common/swipe_navigation.yaml
+        file: ./swipe_navigation.yaml
       widgets:
         - obj:
             width: 100%
