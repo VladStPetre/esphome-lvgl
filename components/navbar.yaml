@@ -1,0 +1,149 @@
+# ---------------------------------------------------------------------------
+# navbar.yaml  -  reusable vertical LVGL navigation bar (4 icon buttons)
+#
+# Include it as a widget inside a page (see usage in the reply), passing vars:
+#   id, align, x, y            -> placement
+#   bar_w, btn_size            -> sizes (px)
+#   radius                     -> corner radius of the bar
+#   bg_color, bg_opa           -> background colour + transparency (e.g. 40%)
+#   border_color, border_w     -> SOLID margin (opa is always 100%)
+#   icon_color, active_color   -> icon colour / colour of the selected button
+#   font                       -> id of a font that contains the MDI glyphs
+#   icon1..icon4               -> MDI glyphs, e.g. "\U000F02DC"
+#   page1..page4               -> id of the page each button opens
+#   active                     -> button (1-4) that starts selected
+# ---------------------------------------------------------------------------
+obj:
+  id: ${id}
+  align: ${align}
+  x: ${x}
+  y: ${y}
+  width: ${bar_w}
+  height: SIZE_CONTENT
+  radius: ${radius}
+  bg_color: ${bg_color}
+  bg_opa: ${bg_opa}            # semi transparent background
+  border_color: ${border_color}
+  border_opa: COVER            # solid border
+  border_width: ${border_w}
+  pad_all: 6
+  pad_row: 6
+  shadow_width: 0
+  scrollable: false
+  layout:
+    type: flex
+    flex_flow: COLUMN
+    flex_align_main: SPACE_EVENLY
+    flex_align_cross: CENTER
+  widgets:
+    - button:
+        id: ${id}_b1
+        width: ${btn_size}
+        height: ${btn_size}
+        radius: ${radius}
+        bg_opa: TRANSP
+        shadow_width: 0
+        border_width: 0
+        checkable: true
+        checked:
+          bg_color: ${active_color}
+          bg_opa: COVER
+        pressed:
+          bg_color: ${active_color}
+          bg_opa: 50%
+        on_press:
+          - lvgl.widget.update: {id: "${id}_b1", state: {checked: true}}
+          - lvgl.widget.update: {id: "${id}_b2", state: {checked: false}}
+          - lvgl.widget.update: {id: "${id}_b3", state: {checked: false}}
+          - lvgl.widget.update: {id: "${id}_b4", state: {checked: false}}
+          - lvgl.page.show: ${page1}
+        widgets:
+          - label:
+              align: CENTER
+              text: "${icon1}"
+              text_font: ${font}
+              text_color: ${icon_color}
+
+    - button:
+        id: ${id}_b2
+        width: ${btn_size}
+        height: ${btn_size}
+        radius: ${radius}
+        bg_opa: TRANSP
+        shadow_width: 0
+        border_width: 0
+        checkable: true
+        checked:
+          bg_color: ${active_color}
+          bg_opa: COVER
+        pressed:
+          bg_color: ${active_color}
+          bg_opa: 50%
+        on_press:
+          - lvgl.widget.update: {id: "${id}_b1", state: {checked: false}}
+          - lvgl.widget.update: {id: "${id}_b2", state: {checked: true}}
+          - lvgl.widget.update: {id: "${id}_b3", state: {checked: false}}
+          - lvgl.widget.update: {id: "${id}_b4", state: {checked: false}}
+          - lvgl.page.show: ${page2}
+        widgets:
+          - label:
+              align: CENTER
+              text: "${icon2}"
+              text_font: ${font}
+              text_color: ${icon_color}
+
+    - button:
+        id: ${id}_b3
+        width: ${btn_size}
+        height: ${btn_size}
+        radius: ${radius}
+        bg_opa: TRANSP
+        shadow_width: 0
+        border_width: 0
+        checkable: true
+        checked:
+          bg_color: ${active_color}
+          bg_opa: COVER
+        pressed:
+          bg_color: ${active_color}
+          bg_opa: 50%
+        on_press:
+          - lvgl.widget.update: {id: "${id}_b1", state: {checked: false}}
+          - lvgl.widget.update: {id: "${id}_b2", state: {checked: false}}
+          - lvgl.widget.update: {id: "${id}_b3", state: {checked: true}}
+          - lvgl.widget.update: {id: "${id}_b4", state: {checked: false}}
+          - lvgl.page.show: ${page3}
+        widgets:
+          - label:
+              align: CENTER
+              text: "${icon3}"
+              text_font: ${font}
+              text_color: ${icon_color}
+
+    - button:
+        id: ${id}_b4
+        width: ${btn_size}
+        height: ${btn_size}
+        radius: ${radius}
+        bg_opa: TRANSP
+        shadow_width: 0
+        border_width: 0
+        checkable: true
+        checked:
+          bg_color: ${active_color}
+          bg_opa: COVER
+        pressed:
+          bg_color: ${active_color}
+          bg_opa: 50%
+        on_press:
+          - lvgl.widget.update: {id: "${id}_b1", state: {checked: false}}
+          - lvgl.widget.update: {id: "${id}_b2", state: {checked: false}}
+          - lvgl.widget.update: {id: "${id}_b3", state: {checked: false}}
+          - lvgl.widget.update: {id: "${id}_b4", state: {checked: true}}
+          - lvgl.page.show: ${page4}
+        widgets:
+          - label:
+              align: CENTER
+              text: "${icon4}"
+              text_font: ${font}
+              text_color: ${icon_color}

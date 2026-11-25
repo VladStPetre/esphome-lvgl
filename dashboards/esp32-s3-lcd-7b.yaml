@@ -97,21 +97,6 @@ packages:
   loading_screen: !include esphome-lvgl/components/loading_page.yaml
   info_screen: !include esphome-lvgl/components/info_page.yaml
 
-lvgl:
-  buffer_size: 100%
-  pages:
-    - id: main_page
-      layout: 1x1
-      <<: !include esphome-lvgl/components/swipe_navigation.yaml
-      bg_color: slate_blue_gray
-      widgets:
-        - label:
-            id: clock_label
-            align: CENTER
-            text: "--:--"
-            text_font: nunito_120
-            text_color: white
-
 
 font:
   - file: "gfonts://Nunito"
@@ -125,3 +110,193 @@ font:
   - file: "gfonts://Nunito"
     id: nunito_18
     size: 18
+
+  - file: https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf
+    id: mdi_28
+    size: 28
+    bpp: 4
+    glyphs:
+      - "\U000F02DC"   # home
+      - "\U000F0150"   # clock-outline
+      - "\U000F02FD"   # information-outline
+
+image:
+  - platform: file
+    file: wallpapers/red-lines-wallpaper-1024x600.jpg
+    id: bg_home
+#    resize: 1024x600
+    type: RGB565
+
+lvgl:
+  buffer_size: 100%
+  bg_color: 0x1E1E2E
+  text_color: 0xFFFFFF
+
+  # ---- NAVBAR: lives on the top layer, so it is visible on EVERY page ----
+  top_layer:
+    widgets:
+      - obj:
+          id: nav
+          align: LEFT_MID
+          x: 8
+          y: 0
+          # Only the bar size is fixed; button positions are computed by the
+          # flex layout below (evenly spread vertically, centered horizontally).
+          width: 60
+          height: 180
+          radius: 30
+          bg_color: 0x000000
+          bg_opa: 40%
+          border_color: 0xFFFFFF
+          border_opa: COVER
+          border_width: 2
+          pad_all: 0
+          shadow_width: 0
+          scrollable: false
+          layout:
+            type: flex
+            flex_flow: COLUMN
+            flex_align_main: SPACE_EVENLY    # equal space above/between/below
+            flex_align_cross: CENTER         # centered horizontally
+            flex_align_track: CENTER
+          widgets:
+            - button:
+                id: nav_b1
+                width: 44
+                height: 44
+                radius: 22
+                bg_opa: TRANSP
+                shadow_width: 0
+                border_width: 0
+                checkable: true
+                state:
+                  checked: true          # starts selected (home page)
+                checked:
+                  bg_color: 0x2196F3
+                  bg_opa: 30%
+                pressed:
+                  bg_color: 0x2196F3
+                  bg_opa: 15%
+                on_press:
+                  - lvgl.widget.update: {id: nav_b1, state: {checked: true}}
+                  - lvgl.widget.update: {id: nav_b2, state: {checked: false}}
+                  - lvgl.widget.update: {id: nav_b3, state: {checked: false}}
+                  - lvgl.page.show: main_page
+                widgets:
+                  - label:
+                      align: CENTER
+                      text: "\U000F02DC"
+                      text_font: mdi_28
+                      text_color: 0xFFFFFF
+
+            - button:
+                id: nav_b2
+                width: 44
+                height: 44
+                radius: 22
+                bg_opa: TRANSP
+                shadow_width: 0
+                border_width: 0
+                checkable: true
+                checked:
+                  bg_color: 0x2196F3
+                  bg_opa: 30%
+                pressed:
+                  bg_color: 0x2196F3
+                  bg_opa: 15%
+                on_press:
+                  - lvgl.widget.update: {id: nav_b1, state: {checked: false}}
+                  - lvgl.widget.update: {id: nav_b2, state: {checked: true}}
+                  - lvgl.widget.update: {id: nav_b3, state: {checked: false}}
+                  - lvgl.page.show: page_clock
+                widgets:
+                  - label:
+                      align: CENTER
+                      text: "\U000F0150"
+                      text_font: mdi_28
+                      text_color: 0xFFFFFF
+
+            - button:
+                id: nav_b3
+                width: 44
+                height: 44
+                radius: 22
+                bg_opa: TRANSP
+                shadow_width: 0
+                border_width: 0
+                checkable: true
+                checked:
+                  bg_color: 0x2196F3
+                  bg_opa: 30%
+                pressed:
+                  bg_color: 0x2196F3
+                  bg_opa: 15%
+                on_press:
+                  - lvgl.widget.update: {id: nav_b1, state: {checked: false}}
+                  - lvgl.widget.update: {id: nav_b2, state: {checked: false}}
+                  - lvgl.widget.update: {id: nav_b3, state: {checked: true}}
+                  - lvgl.page.show: page_info
+                widgets:
+                  - label:
+                      align: CENTER
+                      text: "\U000F02FD"
+                      text_font: mdi_28
+                      text_color: 0xFFFFFF
+
+  # ---- PAGES (content is shifted right to leave room for the navbar) ----
+  pages:
+    - id: main_page
+      widgets:
+        - image:
+            src: bg_home
+            align: CENTER
+        - label:
+            align: CENTER
+            x: 36
+            y: -30
+            text: "Home"
+            text_font: montserrat_28
+
+    - id: page_clock
+      widgets:
+        - image:
+            src: bg_home
+            align: CENTER
+        - label:
+            id: clock_label
+            align: CENTER
+            x: 36
+            y: -20
+            text: "--:--"
+            text_font: nunito_120
+        - label:
+            id: clock_date
+            align: CENTER
+            x: 36
+            y: 30
+            text: "..."
+            text_font: montserrat_20
+
+    - id: page_info
+      widgets:
+        - label:
+            align: CENTER
+            x: 36
+            y: -50
+            text: "Device info"
+            text_font: montserrat_28
+        - label:
+            align: CENTER
+            x: 36
+            y: -5
+            text: "Display: 480x320"
+            text_font: montserrat_16
+        - label:
+            id: info_uptime
+            align: CENTER
+            x: 36
+            y: 25
+            text: "Uptime: 0 s"
+            text_font: montserrat_16
+
+
